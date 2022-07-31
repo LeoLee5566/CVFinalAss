@@ -3,6 +3,7 @@ import os
 from matplotlib import pyplot as plt
 from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
+import torch.optim.lr_scheduler as lr_scheduler
 from torchvision import transforms
 from model import *
 
@@ -52,6 +53,7 @@ if __name__ == '__main__':
     # optimizer
     learning_rate = 0.01
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.9)
 
     # train model
     epoch = 10
@@ -85,6 +87,7 @@ if __name__ == '__main__':
             total_train_accuracy += (y_pred.argmax(1) == y_train).sum()
             if total_train_step % 200 == 0:
                 writer.add_scalar("train_loss_vit", loss.item(), total_train_step)
+        scheduler.step()
         writer.add_scalar("train_acc_vit", total_train_accuracy / len(train_set), total_train_step)
         print("train acc of epoch {}: {}".format(current_epoch, total_train_accuracy / len(train_set)))
 
